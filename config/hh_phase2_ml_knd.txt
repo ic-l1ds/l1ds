@@ -1,0 +1,3 @@
+drop .*
+keep jet_isb
+keep constituents

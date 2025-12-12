@@ -1,0 +1,13 @@
+drop .*
+keep nGenPart
+keep GenPart.*
+keep nJet
+keep Jet_.*
+keep nL1nnPuppiTau
+keep L1nnPuppiTau_.*
+keep nL1puppiExtJetSC4
+keep L1puppiExtJetSC4_.*
+keep nL1puppiJetSC4NG
+keep L1puppiJetSC4NG_.*
+keep nTau
+keep Tau_.*

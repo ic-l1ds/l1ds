@@ -9,7 +9,8 @@ action() {
     cd nanoaod_base_analysis
     #local this_file="$( [ ! -z "$ZSH_VERSION" ] && echo "${(%):-%x}" || echo "${BASH_SOURCE[0]}" )"
     #local this_dir="$( cd "$( dirname "$this_file" )" && pwd )"
-    export CMT_BASE="DUMMY"
+    #export CMT_BASE="DUMMY"
+    export CMT_BASE="/vols/cms/jleonhol/l1ds/nanoaod_base_analysis"
     #export CMT_BASE="/home/hep/jleonhol/l1dsbbtt/nanoaod_base_analysis"
     if [[ "$CMT_BASE" == "DUMMY" ]]; then
         echo "Need to change the path stored in CMT_BASE to the present folder"
@@ -303,6 +304,7 @@ action() {
             cmt_pip_install flake8
             cmt_pip_install luigi==2.8.13
             cmt_pip_install tabulate
+            cmt_pip_install pandas==1.5.0
             cmt_pip_install git+https://gitlab.cern.ch/cms-phys-ciemat/analysis_tools.git
             cmt_pip_install git+https://gitlab.cern.ch/cms-phys-ciemat/plotting_tools.git
             cmt_pip_install --no-deps git+https://github.com/riga/law

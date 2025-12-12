@@ -1,0 +1,11 @@
+antikt:
+  name: AntiKtFastJet
+  path: modules.jet
+  parameters:
+    year: self.config.year
+
+gen:
+  name: GenJetMatching
+  path: modules.jet
+  parameters:
+    year: self.config.year

@@ -1,0 +1,5 @@
+gen:
+  name: GenTauHad
+  path: modules.gen
+  parameters:
+    year: self.config.year

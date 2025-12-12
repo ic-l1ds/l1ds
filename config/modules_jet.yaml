@@ -1,0 +1,5 @@
+antikt:
+  name: AntiKtFastJet
+  path: modules.jet
+  parameters:
+    year: self.config.year
