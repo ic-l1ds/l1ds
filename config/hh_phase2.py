@@ -12,12 +12,16 @@ class Config(base_config):
         processes = [
             Process("htt", Label("H->tautau"), color=(0, 0, 0), isSignal=True),
             Process("hh4b", Label("HH->4b"), color=(0, 0, 0), isSignal=True),
+            Process("tt_sl", Label("tt (SL)"), color=(0, 0, 0), isData=False),
         ]
 
         process_group_names = {
             "default": [
                 
             ],
+            "tt_sl": [
+                "tt_sl"
+            ]
         }
 
         process_training_names = {}
@@ -45,6 +49,12 @@ class Config(base_config):
                 dataset="/GluGluToHHTo4B_node_SM_TuneCP5_14TeV-amcatnlo-pythia8/"
                     "jleonhol-Phase2Nano15_wpfpuppi-00000000000000000000000000000000/USER",
                 process=self.processes.get("hh4b"),
+                xs=0.02964,
+                tags=["ul"]),
+            Dataset("tt_sl",
+                dataset="/TTToSemileptonic_TuneCP5_14TeV-powheg-pythia8/"
+                    "jleonhol-Phase2Nano15_wpfpuppi-00000000000000000000000000000000/USER",
+                process=self.processes.get("tt_sl"),
                 xs=0.02964,
                 tags=["ul"]),
         ]

@@ -1,0 +1,19 @@
+GenJetParticleMatching:
+  name: GenJetParticleMatching
+  path: modules.jet
+  parameters:
+    year: self.config.year
+
+
+JetGenJetMatching_l1:
+  name: JetGenJetMatching
+  path: modules.jet
+  parameters:
+    jet_var: L1puppiJetSC4NG
+
+
+JetGenJetMatching_offline:
+  name: JetGenJetMatching
+  path: modules.jet
+  parameters:
+    jet_var: Jet

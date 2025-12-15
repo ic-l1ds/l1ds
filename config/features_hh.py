@@ -31,4 +31,45 @@ features = [
         binning=(11, -5.5, 5.5),
         x_title=Label("Number of L1 jets - Number of gen muons"),
     ),
+
+    Feature("GenBJet_pt", "GenJet_pt[GenJet_pdgId == 5]",
+        binning=(50, 0, 100),
+        x_title=Label("Gen Jet p_T (matched to b quark)"),
+        units="GeV"
+    ),
+
+    Feature("GenWJet_pt", "GenJet_pt[GenJet_pdgId == 24]",
+        binning=(50, 0, 100),
+        x_title=Label("Gen Jet p_T (matched to q from W)"),
+        units="GeV"
+    ),
+
+    Feature("GenBJet_matchedl1jet_pt", "GenJet_pt[GenJet_pdgId == 5 && GenJet_matchL1puppiJetSC4NG == 1]",
+        binning=(50, 0, 100),
+        x_title=Label("Gen Jet p_T (matched to b quark, matched to L1 jet)"),
+        units="GeV",
+        selection_name="L1 Jet"
+    ),
+
+    Feature("GenWJet_matchedl1jet_pt", "GenJet_pt[GenJet_pdgId == 24 && GenJet_matchL1puppiJetSC4NG == 1]",
+        binning=(50, 0, 100),
+        x_title=Label("Gen Jet p_T (matched to q from W, matched to L1 jet)"),
+        units="GeV",
+        selection_name="L1 Jet"
+    ),
+
+    Feature("GenBJet_matchedjet_pt", "GenJet_pt[GenJet_pdgId == 5 && GenJet_matchJet == 1]",
+        binning=(50, 0, 100),
+        x_title=Label("Gen Jet p_T (matched to b quark, matched to offline jet)"),
+        units="GeV",
+        selection_name="Offline Jet"
+    ),
+
+    Feature("GenWJet_matchedjet_pt", "GenJet_pt[GenJet_pdgId == 24 && GenJet_matchJet == 1]",
+        binning=(50, 0, 100),
+        x_title=Label("Gen Jet p_T (matched to q from W, matched to offline jet)"),
+        units="GeV",
+        selection_name="Offline Jet"
+    ),
+
 ]
