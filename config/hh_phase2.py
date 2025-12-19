@@ -53,7 +53,7 @@ class Config(base_config):
                 tags=["ul"]),
             Dataset("tt_sl",
                 dataset="/TTToSemileptonic_TuneCP5_14TeV-powheg-pythia8/"
-                    "jleonhol-Phase2Nano15_wpfpuppi-00000000000000000000000000000000/USER",
+                    "jleonhol-Phase2Nano15_fullPuppi-00000000000000000000000000000000/USER",
                 process=self.processes.get("tt_sl"),
                 xs=0.02964,
                 tags=["ul"]),

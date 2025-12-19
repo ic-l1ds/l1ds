@@ -11,3 +11,11 @@ keep nL1puppiJetSC4NG
 keep L1puppiJetSC4NG_.*
 keep nTau
 keep Tau_.*
+keep nL1BarrelPf
+keep L1BarrelPf.*
+keep nL1BarrelExtPf
+keep L1BarrelExtPf.*
+keep nL1BarrelPuppi
+keep L1BarrelPuppi.*
+keep nL1BarrelExtPuppi
+keep L1BarrelExtPuppi.*

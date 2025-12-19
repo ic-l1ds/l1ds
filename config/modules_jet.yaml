@@ -1,5 +1,55 @@
-antikt:
-  name: AntiKtFastJet
+# antikt:
+#   name: AntiKtFastJet
+#   path: modules.jet
+#   parameters:
+#     year: self.config.year
+
+GenJetParticleMatching:
+  name: GenJetParticleMatching
   path: modules.jet
   parameters:
     year: self.config.year
+
+sc:
+  name: SeededConeJet
+  path: modules.jet
+  parameters:
+    max_jets: 20
+    max_const: 999
+    update_mask: true
+    R_seed: 0.4
+    R_cen: 0.4
+    R_clu: 0.4
+    part_type: L1ExtPuppi
+    output_name: L1ExtPuppi
+
+sc_pf:
+  name: SeededConeJet
+  path: modules.jet
+  parameters:
+    max_jets: 50
+    max_const: 999
+    update_mask: true
+    R_seed: 0.4
+    R_cen: 0.4
+    R_clu: 0.4
+    part_type: L1ExtPf
+    output_name: L1ExtPf
+
+genjet_matching_L1ExtPuppi:
+  name: CustomJetGenJetMatching
+  path: modules.jet
+  parameters:
+      jet_name: L1ExtPuppi
+
+genjet_matching_L1ExtPf:
+  name: CustomJetGenJetMatching
+  path: modules.jet
+  parameters:
+      jet_name: L1ExtPf
+
+JetGenJetMatching_l1:
+  name: JetGenJetMatching
+  path: modules.jet
+  parameters:
+    jet_var: L1puppiJetSC4NG

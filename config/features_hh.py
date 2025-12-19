@@ -72,4 +72,18 @@ features = [
         selection_name="Offline Jet"
     ),
 
+    Feature("GenWJet_matchedSCjet_pt", "GenJet_pt[GenJet_pdgId == 24 && GenJet_L1ExtPuppi_dR < 0.4]",
+        binning=(50, 0, 100),
+        x_title=Label("Gen Jet p_T (matched to q from W, matched to SC (Puppi) jet)"),
+        units="GeV",
+        selection_name="SC Jet (Puppi)"
+    ),
+
+    Feature("GenWJet_matchedSCPFjet_pt", "GenJet_pt[GenJet_pdgId == 24 && GenJet_L1ExtPf_dR < 0.4]",
+        binning=(50, 0, 100),
+        x_title=Label("Gen Jet p_T (matched to q from W, matched to SC (PF) jet)"),
+        units="GeV",
+        selection_name="SC Jet (PF)"
+    ),
+
 ]
