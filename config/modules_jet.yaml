@@ -23,6 +23,20 @@ sc:
     part_type: L1ExtPuppi
     output_name: L1ExtPuppi
 
+sc8:
+  name: SeededConeJet
+  path: modules.jet
+  parameters:
+    max_jets: 8
+    max_const: 999
+    update_mask: true
+    R_seed: 0.4
+    R_cen: 0.4
+    R_clu: 0.4
+    part_type: L1ExtPuppi
+    output_name: L1ExtPuppi8
+
+
 sc_pf:
   name: SeededConeJet
   path: modules.jet
@@ -42,6 +56,12 @@ genjet_matching_L1ExtPuppi:
   parameters:
       jet_name: L1ExtPuppi
 
+genjet_matching_L1ExtPuppi8:
+  name: CustomJetGenJetMatching
+  path: modules.jet
+  parameters:
+      jet_name: L1ExtPuppi8
+
 genjet_matching_L1ExtPf:
   name: CustomJetGenJetMatching
   path: modules.jet
@@ -53,3 +73,11 @@ JetGenJetMatching_l1:
   path: modules.jet
   parameters:
     jet_var: L1puppiJetSC4NG
+
+
+sc8_jet:
+  name: JetMaker
+  path: modules.jet
+  parameters:
+      jet_name: L1ExtPuppi8
+

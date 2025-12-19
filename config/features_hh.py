@@ -79,6 +79,13 @@ features = [
         selection_name="SC Jet (Puppi)"
     ),
 
+    Feature("GenWJet_matchedSC8jet_pt", "GenJet_pt[GenJet_pdgId == 24 && GenJet_L1ExtPuppi8_dR < 0.4]",
+        binning=(50, 0, 100),
+        x_title=Label("Gen Jet p_T (matched to q from W, matched to Top 8 SC (Puppi) jet)"),
+        units="GeV",
+        selection_name="SC Jet (Puppi, Top 8 only)"
+    ),
+
     Feature("GenWJet_matchedSCPFjet_pt", "GenJet_pt[GenJet_pdgId == 24 && GenJet_L1ExtPf_dR < 0.4]",
         binning=(50, 0, 100),
         x_title=Label("Gen Jet p_T (matched to q from W, matched to SC (PF) jet)"),

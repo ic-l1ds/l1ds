@@ -6,9 +6,9 @@ ROOT = import_root()
 
 class JetOutput():
     def __init__(self, *args, **kwargs):
-        super(JetOutput, self).__init__(*args, **kwargs)
         self.max_jets = kwargs.pop("max_jets", 8)
         self.max_const = kwargs.pop("max_const", 16)
+        super().__init__(*args, **kwargs)
 
         if not os.getenv(f"JetOutput_{self.max_jets}_{self.max_const}"):
             os.environ[f"JetOutput_{self.max_jets}_{self.max_const}"] = "JetOutput"
@@ -21,19 +21,21 @@ class JetOutput():
                 using Vd = const ROOT::RVec<double>&;
                 using Vint = const ROOT::RVec<int>&;
 
-                const size_t max_jets = %s;
-                const size_t max_const = %s;
-
                 struct output_jet_%s_%s {
                     std::vector<std::vector<double>> jets;                          // [max_jets]
                     std::vector<std::vector<std::vector<double>>> constituents;     // [max_jets][max_const]
 
                     output_jet_%s_%s() :
-                        jets(max_jets, {0.0, 0.0, 0.0}),
-                        constituents(max_jets, std::vector<std::vector<double>>(max_const, {0.0,0.0,0.0,0.0,0.0,0.0,0.0}))
+                        jets(%s, {0.0, 0.0, 0.0}),
+                        constituents(%s, std::vector<std::vector<double>>(%s, {0.0,0.0,0.0,0.0,0.0,0.0,0.0}))
                     {}
                 };
-            """ % (self.max_jets, self.max_const, self.max_jets, self.max_const, self.max_jets, self.max_const,))
+            """ % (
+                    self.max_jets, self.max_const,
+                    self.max_jets, self.max_const,
+                    self.max_jets, self.max_jets, self.max_const
+                )
+            )
 
 
 class AntiKtFastJetProducer(JetOutput):
@@ -255,7 +257,7 @@ class SeededConeJetAlgoProducer():
                     std::vector<int> constituents;
 
                     output_single_jet():
-                        jet(2, 0.),
+                        jet(3, 0.),
                         constituents({})
                     {}
                 };
@@ -265,7 +267,7 @@ class SeededConeJetAlgoProducer():
                 using Vint = const ROOT::RVec<int>&;
                 output_single_jet run_sc_single_jet(
                     float axis_eta, float axis_phi,
-                    Vd part_eta, Vd part_phi,
+                    Vd part_pt, Vd part_eta, Vd part_phi,
                     Vd weight, float R_clus,
                     std::vector<int>& mask, bool update_mask
                 ) {
@@ -285,15 +287,16 @@ class SeededConeJetAlgoProducer():
                         auto deltaEta = part_eta[ip] - axis_eta;
                         auto deltaPhi = reco::deltaPhi(part_phi[ip], axis_phi);
                         total_weight += weight[ip];
-                        out.jet[0] += deltaEta * weight[ip];
-                        out.jet[1] += deltaPhi * weight[ip];
+                        out.jet[0] += part_pt[ip];
+                        out.jet[1] += deltaEta * weight[ip];
+                        out.jet[2] += deltaPhi * weight[ip];
                     }
                     if (total_weight > 0) {
-                        out.jet[0] /= total_weight;
                         out.jet[1] /= total_weight;
+                        out.jet[2] /= total_weight;
                     }
-                    out.jet[0] += axis_eta;
-                    out.jet[1] += axis_phi;
+                    out.jet[1] += axis_eta;
+                    out.jet[2] += axis_phi;
                     return out;
                 }
             """)
@@ -323,6 +326,11 @@ class SeededConeJetProducer(JetOutput, SeededConeJetAlgoProducer):
                 {
                     return (jA.pt > jB.pt);
                 }
+
+                bool jetSort (const output_single_jet& jA, const output_single_jet& jB)
+                {
+                    return (jA.jet[0] > jB.jet[0]);
+                }
             """)
 
         if not os.getenv(f"sc_{self.max_jets}_{self.max_const}"):
@@ -337,7 +345,7 @@ class SeededConeJetProducer(JetOutput, SeededConeJetAlgoProducer):
                 using Vd = const ROOT::RVec<double>&;
                 using Vint = const ROOT::RVec<int>&;
 
-                output_jet_%s_%s run_sc(
+                output_jet_%s_%s run_sc_%s_%s(
                         int nPart,
                         Vd Part_pt, Vd Part_eta, Vd Part_phi,
                         Vd Part_dxy, Vd Part_z0, Vd Part_puppiWeight,
@@ -382,17 +390,25 @@ class SeededConeJetProducer(JetOutput, SeededConeJetAlgoProducer):
                         std::stable_sort(seed_index_pt_vec.begin(), seed_index_pt_vec.end(), seedSort);
 
                     // Run SC over the selected seeds
-                    for (size_t idx = 0; idx < std::min(max_jets, seed_index_pt_vec.size()); idx++) {
+                    std::vector<output_single_jet> output_jets;
+                    for (size_t idx = 0; idx < seed_index_pt_vec.size(); idx++) {
                         auto elem = seed_index_pt_vec[idx];
                         auto result = run_sc_single_jet(
                             Part_eta[elem.seed], Part_phi[elem.seed],
-                            Part_eta, Part_phi,
+                            Part_pt, Part_eta, Part_phi,
                             Part_pt, R_clu,
                             mask, update_mask
                         );
-                        std::vector<double> jet = {elem.pt, result.jet[0], result.jet[1]};
+                        result.jet[0] += elem.pt;
+                        output_jets.push_back(result);
+                    }
+                    if (output_jets.size() > 1)  // sorting by pt
+                        std::stable_sort(output_jets.begin(), output_jets.end(), jetSort);
+
+                    for (size_t idx = 0; idx < std::min(size_t(%s), output_jets.size()); idx++) {
+                        auto elem = output_jets[idx];
                         std::vector<std::vector<double>> constituents;
-                        for (auto &index: result.constituents) {
+                        for (auto &index: elem.constituents) {
                             constituents.push_back(
                                 {
                                     Part_pt[index],
@@ -404,21 +420,24 @@ class SeededConeJetProducer(JetOutput, SeededConeJetAlgoProducer):
                                     Part_puppiWeight[index]
                                 }
                             );
-                            jet[0] += Part_pt[index];
                         }
-                        out.jets[idx] = jet;
+                        out.jets[idx] = elem.jet;
                         out.constituents[idx] = constituents;
                     }
                     return out;
                 }
-            """ % (self.max_jets, self.max_const, self.max_jets, self.max_const))
+            """ % (
+                    self.max_jets, self.max_const, self.max_jets, self.max_const, 
+                    self.max_jets, self.max_const, self.max_jets
+                )
+            )
 
 
     def run(self, df):
         from analysis_tools.utils import randomize
         tmp = randomize("tmp")
         df = df.Define(tmp,
-            f"""run_sc(
+            f"""run_sc_{self.max_jets}_{self.max_const}(
                 n{self.part_type}, {self.part_type}_pt, {self.part_type}_eta, {self.part_type}_phi,
                 {self.part_type}_dxy, {self.part_type}_z0, {self.part_type}_puppiWeight,
                 {self.R_seed}, {self.R_cen}, {self.R_clu}, {self.update_mask})
@@ -457,7 +476,7 @@ class CustomJetGenJetMatchingProducer():
     def __init__(self, *args, **kwargs):
         self.jet_name = kwargs.pop("jet_name")
         if not os.getenv("_jet_CustomJetGenJetMatchingProducer"):
-            os.environ["_jet_CustomJetGenJetMatchingProducer"] = ""
+            os.environ["_jet_CustomJetGenJetMatchingProducer"] = "jet"
 
             ROOT.gInterpreter.Declare("""
                 using Vd = const ROOT::RVec<double>&;
@@ -465,7 +484,7 @@ class CustomJetGenJetMatchingProducer():
                 using Vint = const ROOT::RVec<int>&;
                 #include "DataFormats/Math/interface/deltaR.h"
 
-                ROOT::RVec<double> genjet_matches_jet(
+                ROOT::RVec<double> custom_genjet_matches_jet(
                     std::vector<std::vector<double>> jets,
                     int nGenJet,
                     Vfloat GenJet_eta,
@@ -492,10 +511,10 @@ class CustomJetGenJetMatchingProducer():
     def run(self, df):
         df = df.Define(
             f"GenJet_{self.jet_name}_dR",
-            f"genjet_matches_jet({self.jet_name}_jets, nGenJet, GenJet_eta, GenJet_phi)"
+            f"custom_genjet_matches_jet({self.jet_name}_jets, nGenJet, GenJet_eta, GenJet_phi)"
         )
         return df, [f"GenJet_{self.jet_name}_dR"]
-    
+
 
 def CustomJetGenJetMatching(*args, **kwargs):
     """
@@ -514,3 +533,51 @@ def CustomJetGenJetMatching(*args, **kwargs):
     """
 
     return lambda: CustomJetGenJetMatchingProducer(*args, **kwargs)
+
+
+class JetMakerProducer(JetOutput):
+    def __init__(self, *args, **kwargs):
+        self.jet_name = kwargs.pop("jet_name")
+        super().__init__(*args, **kwargs)
+        ROOT.gInterpreter.Declare("""
+            std::vector<ROOT::RVec<double>> build_jets(std::vector<std::vector<double>> jets, int max_jets) {
+                ROOT::RVec<double> Jet_pt(max_jets, 0);
+                ROOT::RVec<double> Jet_eta(max_jets, 0);
+                ROOT::RVec<double> Jet_phi(max_jets, 0);
+                for (size_t i = 0; i < max_jets; i++) {
+                    Jet_pt[i] = jets[i][0];
+                    Jet_eta[i] = jets[i][1];
+                    Jet_phi[i] = jets[i][2];
+                }
+                return {Jet_pt, Jet_eta, Jet_phi};
+            }
+        """)
+
+    def run(self, df):
+        from analysis_tools.utils import randomize
+
+        tmp = randomize("tmp")
+        branches = [f"{self.jet_name}_{b}" for b in ["pt", "eta", "phi"]]
+        df = df.Define(tmp, f"build_jets({self.jet_name}_jets, {self.max_jets})")
+        for ib, b in enumerate(branches):
+            df = df.Define(b, f"{tmp}[{ib}]")
+        return df, branches
+
+
+def JetMaker(*args, **kwargs):
+    """
+    Module to create jet vectors obtained by running custom clusterings
+
+    YAML sintaxis:
+
+    .. code-block:: yaml
+
+        codename:
+            name: JetMaker
+            path: modules.jet
+            parameters:
+                jet_name: Part
+
+    """
+
+    return lambda: JetMakerProducer(*args, **kwargs)

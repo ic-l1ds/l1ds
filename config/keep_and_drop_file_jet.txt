@@ -1,0 +1,4 @@
+drop .*
+keep nL1puppiJetSC4NG
+keep L1puppiJetSC4NG.*
+keep L1ExtPuppi8.*
