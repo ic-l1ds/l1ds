@@ -19,3 +19,13 @@ keep nL1BarrelPuppi
 keep L1BarrelPuppi.*
 keep nL1BarrelExtPuppi
 keep L1BarrelExtPuppi.*
+keep nL1Puppi
+keep L1Puppi.*
+keep nL1ExtPuppi
+keep L1ExtPuppi.*
+keep nL1Pf
+keep L1Pf.*
+keep nL1ExtPf
+keep L1ExtPf.*
+
+

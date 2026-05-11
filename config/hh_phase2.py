@@ -13,6 +13,7 @@ class Config(base_config):
             Process("htt", Label("H->tautau"), color=(0, 0, 0), isSignal=True),
             Process("hh4b", Label("HH->4b"), color=(0, 0, 0), isSignal=True),
             Process("tt_sl", Label("tt (SL)"), color=(0, 0, 0), isData=False),
+            Process("qcd", Label("QCD"), color=(0, 0, 0), isData=False),
         ]
 
         process_group_names = {
@@ -35,7 +36,7 @@ class Config(base_config):
         datasets = [
             Dataset("htt",
                 dataset="/GluGluHToTauTau_M-125_TuneCP5_14TeV-powheg-pythia8_PU200/"
-                    "jleonhol-Phase2Nano15_wjets_reg_new-00000000000000000000000000000000/USER",
+                    "jleonhol-Phase2Nano15_fullPuppi-00000000000000000000000000000000/USER",
                 process=self.processes.get("htt"),
                 xs=0.02964,
                 tags=["ul"]),
@@ -47,7 +48,7 @@ class Config(base_config):
                 tags=["ul"]),
             Dataset("hh4b_puppi",
                 dataset="/GluGluToHHTo4B_node_SM_TuneCP5_14TeV-amcatnlo-pythia8/"
-                    "jleonhol-Phase2Nano15_wpfpuppi-00000000000000000000000000000000/USER",
+                    "jleonhol-Phase2Nano15_fullPuppi-00000000000000000000000000000000/USER",
                 process=self.processes.get("hh4b"),
                 xs=0.02964,
                 tags=["ul"]),
@@ -58,7 +59,26 @@ class Config(base_config):
                 xs=0.02964,
                 tags=["ul"]),
         ]
-        return ObjectCollection(datasets)
 
+        qcd_datasets = {
+            "QCD_Pt-20To30": "/QCD_Pt-20To30_TuneCP5_14TeV-pythia8/jleonhol-Phase2Nano15_fullPuppi-00000000000000000000000000000000/USER",
+            "QCD_Pt-30To50": "/QCD_Pt-30To50_TuneCP5_14TeV-pythia8/jleonhol-Phase2Nano15_fullPuppi-00000000000000000000000000000000/USER",
+            "QCD_Pt-50To80": "/QCD_Pt-50To80_TuneCP5_14TeV-pythia8/jleonhol-Phase2Nano15_fullPuppi-00000000000000000000000000000000/USER",
+            "QCD_Pt-80To120": "/QCD_Pt-80To120_TuneCP5_14TeV-pythia8/jleonhol-Phase2Nano15_fullPuppi-00000000000000000000000000000000/USER",
+            "QCD_Pt-120To170": "/QCD_Pt-120To170_TuneCP5_14TeV-pythia8/jleonhol-Phase2Nano15_fullPuppi-00000000000000000000000000000000/USER",
+            "QCD_Pt-170To300": "/QCD_Pt-170To300_TuneCP5_14TeV-pythia8/jleonhol-Phase2Nano15_fullPuppi-00000000000000000000000000000000/USER",
+            "QCD_Pt-300To470": "/QCD_Pt-300To470_TuneCP5_14TeV-pythia8/jleonhol-Phase2Nano15_fullPuppi-00000000000000000000000000000000/USER",
+            "QCD_Pt-470To600": "/QCD_Pt-470To600_TuneCP5_14TeV-pythia8/jleonhol-Phase2Nano15_fullPuppi-00000000000000000000000000000000/USER",
+            "QCD_Pt-600ToInf": "/QCD_Pt-600ToInf_TuneCP5_14TeV-pythia8/jleonhol-Phase2Nano15_fullPuppi-00000000000000000000000000000000/USER",
+        }
+        for d_name, dataset in qcd_datasets.items():
+            datasets.append(
+                Dataset(d_name,
+                dataset=dataset,
+                process=self.processes.get("qcd"),
+                xs=1)
+            )
+
+        return ObjectCollection(datasets)
 
 config = Config("hh_phase2", year="Phase 2", ecm=14, lumi_pb=3000)
